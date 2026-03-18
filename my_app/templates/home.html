@@ -1,0 +1,257 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - BestMedia</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+
+<body>
+
+<!-- Navbar minimal -->
+<div class="navbar">
+    <i class='bx bx-menu' id="menu-btn"></i>
+    <h2 class="logo animated-logo">
+        <span style="--i:1">B</span>
+        <span style="--i:2">e</span>
+        <span style="--i:3">s</span>
+        <span style="--i:4">t</span>
+        <span style="--i:5">M</span>
+        <span style="--i:6">e</span>
+        <span style="--i:7">d</span>
+        <span style="--i:8">i</span>
+        <span style="--i:9">a</span>
+    </h2>
+</div>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <ul class="sidebar-links">
+        <li><a href="{% url 'search' %}"><i class='bx bx-search'></i> Qidirish</a></li>
+        <hr>
+        <li><a href="{% url 'chat' %}"><i class='bx bx-message-rounded-dots'></i> Chat</a></li>
+        <hr>
+        <li><a href="{% url 'profile' %}"><i class='bx bx-user'></i> Profil</a></li>
+        <hr>
+        <li><a href="{% url 'logout' %}"><i class='bx bx-log-out'></i> Chiqish</a></li>
+        <hr>
+        <!-- Dark / Light toggle -->
+        <li class="theme-toggle-sidebar">
+            <span>🔆 Dark / Light</span>
+            <a id="theme-toggle-sidebar" title="Toggle Dark / Light Mode">
+                <i class='bx bx-moon'></i>
+            </a>
+        </li>
+    </ul>
+
+    <!-- Sidebar oxirgi ko‘rilganlar -->
+    <div class="sidebar-recent">
+        <h4>Oxirgi ko‘rilgan animelar</h4>
+        <div id="recent-cards-container">
+            <!-- JS orqali oxirgi 2 ta card shu yerga qo‘shiladi -->
+        </div>
+    </div>
+
+    <!-- Sidebar versiya -->
+    <div class="sidebar-version">
+        <small>Versiya 0.00.07</small>
+    </div>
+</div>
+
+<!-- Overlay -->
+<div class="overlay" id="overlay"></div>
+
+<!-- Categories -->
+<div class="categories">
+    {% for category in categories %}
+        <button class="category-btn" data-id="{{ category.id }}">
+            {{ category.name }}
+        </button>
+    {% endfor %}
+</div>
+
+<!-- Container -->
+<div class="container" id="movie-container">
+    {% for movie in movies %}
+    <div class="card" data-id="{{ movie.id }}" data-category="{{ movie.category.id }}">
+        <img src="{{ movie.image.url }}" alt="{{ movie.title }}">
+        <div class="card-content">
+            <h3>{{ movie.title }}</h3>
+            <p>Qismlar: {{ movie.episodes.count }}</p>
+            <a href="{% url 'movie_detail' movie.id %}" class="btn-watch">Anime ko‘rish</a>
+        </div>
+    </div>
+    {% empty %}
+    <p>Hozircha hech qanday anime yo‘q.</p>
+    {% endfor %}
+</div>
+
+<!-- Load More / Close All tugmalari -->
+<div class="load-more-wrapper">
+    <button id="load-more-btn">Barcha animelar</button>
+    <button id="close-all-btn" class="close-btn">Barcha animelarni yopish</button>
+</div>
+
+<!-- Footer -->
+<footer>
+    <div class="footer-content">
+        <h3>ANI•BEST</h3>
+        <p>"Hozrgilardan oldinda emasmiz, <br>
+            Oldingilardan orqada emasmiz, <br>
+            Biz ANI•BEST miz"</p>
+        <div class="footer-links">
+            <a href="https://t.me/ani_best_uzb_anime" target="_blank" class="footer-btn">Telegram Kanal</a>
+            <a href="https://t.me/only_me_subaru" target="_blank" class="footer-btn">Ega</a>
+            <a href="https://t.me/ani_best_chat" target="_blank" class="footer-btn">Murojat</a>
+        </div>
+        <p class="copyright">
+            © 2026 ANI•BEST. Barcha huquqlar himoyalangan.
+        </p>
+    </div>
+</footer>
+
+<!-- JS: Sidebar + Dark/Light + Load More + Category Filter + Recent Cards -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const menuBtn = document.getElementById("menu-btn");
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("overlay");
+
+    // Sidebar toggle
+    menuBtn.addEventListener("click", () => {
+        sidebar.classList.toggle("active");
+        overlay.classList.toggle("active");
+    });
+    overlay.addEventListener("click", () => {
+        sidebar.classList.remove("active");
+        overlay.classList.remove("active");
+    });
+
+    // Dark/Light toggle
+    const themeToggle = document.getElementById("theme-toggle-sidebar");
+    const body = document.body;
+    if (localStorage.getItem("theme") === "light") {
+        body.classList.add("light");
+        themeToggle.innerHTML = "<i class='bx bx-sun'></i>";
+    }
+    themeToggle.addEventListener("click", () => {
+        body.classList.toggle("light");
+        if (body.classList.contains("light")) {
+            themeToggle.innerHTML = "<i class='bx bx-sun'></i>";
+            localStorage.setItem("theme", "light");
+        } else {
+            themeToggle.innerHTML = "<i class='bx bx-moon'></i>";
+            localStorage.setItem("theme", "dark");
+        }
+    });
+
+    // Load More / Close All + Category Filter
+    const loadBtn = document.getElementById("load-more-btn");
+    const closeBtn = document.getElementById("close-all-btn");
+    const cards = document.querySelectorAll("#movie-container .card");
+    const categoryBtns = document.querySelectorAll(".category-btn");
+    let visible = 6;
+
+    function showCardsByCategory(categoryId) {
+        let count = 0;
+        cards.forEach(card => {
+            if (!categoryId || card.dataset.category == categoryId) {
+                card.style.display = count < visible ? "flex" : "none";
+                count++;
+            } else {
+                card.style.display = "none";
+            }
+        });
+        loadBtn.style.display = (count > visible) ? "inline-block" : "none";
+    }
+
+    let lastCategory = categoryBtns[categoryBtns.length - 1];
+    if (lastCategory) {
+        lastCategory.classList.add("active");
+        showCardsByCategory(lastCategory.dataset.id);
+    }
+
+    categoryBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            categoryBtns.forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            visible = 6;
+            showCardsByCategory(btn.dataset.id);
+        });
+    });
+
+    loadBtn.addEventListener("click", () => {
+        visible += 6;
+        const activeBtn = document.querySelector(".category-btn.active");
+        const categoryId = activeBtn ? activeBtn.dataset.id : null;
+        showCardsByCategory(categoryId);
+    });
+    closeBtn.addEventListener("click", () => {
+        visible = 6;
+        const activeBtn = document.querySelector(".category-btn.active");
+        const categoryId = activeBtn ? activeBtn.dataset.id : null;
+        showCardsByCategory(categoryId);
+    });
+
+    // Mobile swipe detection
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const swipeThreshold = 50;
+    document.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, false);
+    document.addEventListener('touchend', e => { touchEndX = e.changedTouches[0].screenX; handleSwipe(); }, false);
+    function handleSwipe() {
+        if (touchEndX > touchStartX + swipeThreshold) {
+            sidebar.classList.add("active");
+            overlay.classList.add("active");
+        } else if (touchEndX < touchStartX - swipeThreshold) {
+            sidebar.classList.remove("active");
+            overlay.classList.remove("active");
+        }
+    }
+
+    // Recent 2 cards
+    const recentContainer = document.getElementById("recent-cards-container");
+    cards.forEach(card => {
+        card.addEventListener("click", () => {
+            const cardData = {
+                id: card.dataset.id,
+                title: card.querySelector("h3").innerText,
+                image: card.querySelector("img").src
+            };
+            let recent = JSON.parse(localStorage.getItem("recentCards") || "[]");
+            recent = recent.filter(c => c.id !== cardData.id);
+            recent.unshift(cardData);
+            if (recent.length > 2) recent = recent.slice(0,2);
+            localStorage.setItem("recentCards", JSON.stringify(recent));
+            renderRecentCards();
+        });
+    });
+
+    function renderRecentCards() {
+        const recent = JSON.parse(localStorage.getItem("recentCards") || "[]");
+        if(!recentContainer) return;
+        recentContainer.innerHTML = "";
+        recent.forEach(card => {
+            const div = document.createElement("div");
+            div.className = "recent-card";
+            div.innerHTML = `<img src="${card.image}" alt="${card.title}"><span>${card.title}</span>`;
+            div.addEventListener("click", () => {
+                window.location.href = `/movie/${card.id}/`;
+            });
+            recentContainer.appendChild(div);
+        });
+    }
+
+    // Initial render
+    renderRecentCards();
+
+});
+</script>
+
+</body>
+</html>

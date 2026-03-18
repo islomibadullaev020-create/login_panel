@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - BestMedia</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+
+<body>
+
+<!-- Fon video yoki rasm -->
+{% if site_settings %}
+    {% if site_settings.background_video %}
+        <video autoplay muted loop class="bg-video">
+            <source src="{{ site_settings.background_video.url }}" type="video/mp4">
+        </video>
+    {% elif site_settings.background_image %}
+        <div class="bg-video bg-image"
+             style="background-image: url('{{ site_settings.background_image.url }}');">
+        </div>
+    {% else %}
+        <video autoplay muted loop class="bg-video">
+            <source src="{% static 'video/uy.mp4' %}" type="video/mp4">
+        </video>
+    {% endif %}
+{% else %}
+    <video autoplay muted loop class="bg-video">
+        <source src="{% static 'video/uy.mp4' %}" type="video/mp4">
+    </video>
+{% endif %}
+
+<div class="wrapper">
+    <h1>Kirish</h1>
+
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <form action="{% url 'login' %}" method="post">
+        {% csrf_token %}
+        <div class="input-box">
+            <input type="text" name="username" placeholder="Username" required>
+            <i class='bx bx-user-circle'></i>
+        </div>
+
+        <div class="input-box">
+            <input type="password" id="password" name="password" placeholder="Parol" required>
+            <i class='bx bx-lock'></i>
+            <i class='bx bxs-low-vision toggle-password' id="togglePassword"></i>
+        </div>
+
+        <div class="remember-forgot">
+            <label><input type="checkbox" name="remember"> Eslab qolish</label>
+            <a href="{% url 'register' %}">Ro'yxatdan o'tish</a>
+        </div>
+
+        <button type="submit" class="btn">Kirish</button>
+    </form>
+</div>
+
+<script>
+    const togglePassword = document.querySelector('#togglePassword');
+    const password = document.querySelector('#password');
+
+    togglePassword.addEventListener('click', function () {
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        this.classList.toggle('active');
+    });
+</script>
+
+</body>
+</html>

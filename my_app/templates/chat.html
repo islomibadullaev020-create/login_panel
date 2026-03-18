@@ -1,0 +1,170 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat | BestMedia</title>
+
+    <!-- Chat CSS -->
+    <link rel="stylesheet" href="{% static 'css/chat.css' %}">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+    <h2>BestMedia</h2>
+    <div class="nav-links">
+        <a href="{% url 'home' %}" class="btn-profile">
+           <i class='bx bxs-left-arrow-alt'></i> Orqaga
+        </a>
+        <a href="{% url 'chat' %}" class="btn-profile">
+            <i class='bx bx-message-rounded-dots'></i> Chat
+        </a>
+    </div>
+</div>
+
+<!-- Chat container -->
+<div class="chat-container">
+
+    <!-- Chat header -->
+    <div class="chat-header">
+        Umumiy Chat
+    </div>
+
+    <!-- Reply preview -->
+    <div id="replyPreview" style="display:none;" class="reply-preview">
+        Javob: <span id="replyUsername"></span> - "<span id="replyMessage"></span>"
+        <button type="button" onclick="cancelReply()">Bekor</button>
+    </div>
+
+    <!-- Chat messages -->
+    <div class="chat-box" id="chatBox">
+        {% for msg in messages %}
+        <div class="message-wrapper {% if msg.user == request.user %}own{% else %}other{% endif %}">
+
+            <div class="message">
+
+                <!-- Username + Time -->
+                <div class="message-header">
+                    <span class="username">
+                        {{ msg.user.username }}
+                        {% if msg.user.is_admin_user %}
+                            <i class='bx bx-crown' title="Admin"></i>
+                        {% endif %}
+                    </span>
+                    <span class="time">
+                        {{ msg.local_created_at|date:"H:i" }}
+                        {% if msg.edited %}
+                            <span class="edited">(edited)</span>
+                        {% endif %}
+                    </span>
+
+                    <div class="actions">
+                        {% if msg.user == request.user or request.user.is_admin_user %}
+                            <i class='bx bx-edit-alt' onclick="openEdit({{ msg.id }})"></i>
+                            <a href="{% url 'delete_message' msg.id %}">
+                                <i class='bx bx-comment-minus'></i>
+                            </a>
+                        {% endif %}
+
+                        {% if request.user.is_admin_user %}
+                            <!-- Ban user button -->
+                            {% if not msg.user.is_admin_user %}
+                                <a href="{% url 'ban_user' msg.user.id %}" title="Ban foydalanuvchi">
+                                    <i class='bx bx-bell-off'></i>
+                                </a>
+                            {% endif %}
+                        {% endif %}
+
+                        <!-- Reply button -->
+                        <i class='bx bx-repost' onclick="replyMessage('{{ msg.user.username }}','{{ msg.message }}')"></i>
+                    </div>
+                </div>
+
+                <!-- Message text -->
+                <div class="message-body" id="text-{{ msg.id }}">
+                    {{ msg.message }}
+                    {% if msg.reply_to %}
+                        <div class="reply-info">
+                            <i class='bx bx-envelope'></i>
+                            Javob: {{ msg.reply_to.user.username }} - "{{ msg.reply_to.message }}"
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Hidden edit form -->
+                <form method="POST"
+                      action="{% url 'edit_message' msg.id %}"
+                      class="edit-form"
+                      id="edit-form-{{ msg.id }}"
+                      style="display:none;">
+                    {% csrf_token %}
+                    <input type="text"
+                           name="message"
+                           value="{{ msg.message }}"
+                           placeholder="Xabarni tahrirlash..."
+                           {% if request.user.is_banned %}disabled{% endif %}
+                           required>
+                    <button type="submit" {% if request.user.is_banned %}disabled{% endif %}>Saqlash</button>
+                    <button type="button" onclick="closeEdit({{ msg.id }})">Bekor</button>
+                </form>
+
+            </div>
+        </div>
+        {% empty %}
+        <p class="no-message">Hali xabar yo‘q</p>
+        {% endfor %}
+    </div>
+
+    <!-- Send message form (footer) -->
+    <form method="POST" class="chat-form">
+        {% csrf_token %}
+        <input type="hidden" name="reply_to" id="replyToInput" value="">
+        <input type="text"
+               name="message"
+               placeholder="Chat yozing..."
+               id="messageInput"
+               {% if request.user.is_banned %}disabled{% endif %}
+               required>
+        <button type="submit" {% if request.user.is_banned %}disabled{% endif %}>
+            <i class='bx bx-send'></i>
+        </button>
+    </form>
+
+</div>
+
+<script>
+    // Edit message toggle
+    function openEdit(id) {
+        document.getElementById("text-" + id).style.display = "none";
+        document.getElementById("edit-form-" + id).style.display = "flex";
+    }
+
+    function closeEdit(id) {
+        document.getElementById("text-" + id).style.display = "block";
+        document.getElementById("edit-form-" + id).style.display = "none";
+    }
+
+    // Reply function
+    function replyMessage(username, message) {
+        document.getElementById("replyPreview").style.display = "block";
+        document.getElementById("replyUsername").innerText = username;
+        document.getElementById("replyMessage").innerText = message;
+        document.getElementById("messageInput").focus();
+        document.getElementById("replyToInput").value = username;
+    }
+
+    function cancelReply() {
+        document.getElementById("replyPreview").style.display = "none";
+        document.getElementById("replyToInput").value = '';
+    }
+
+    // Scroll to bottom on page load
+    const chatBox = document.getElementById('chatBox');
+    chatBox.scrollTop = chatBox.scrollHeight;
+</script>
+
+</body>
+</html>

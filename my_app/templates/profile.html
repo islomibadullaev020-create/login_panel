@@ -1,0 +1,96 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil | BestMedia</title>
+
+
+<!-- CSS -->
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+
+<!-- Boxicons -->
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+
+</head>
+
+<body>
+
+<!-- =========================
+        Navbar
+========================= -->
+
+<nav class="navbar">
+    <div class="nav-container">
+
+
+    <div class="nav-left">
+        <a href="{% url 'home' %}" class="nav-logo">BestMedia</a>
+    </div>
+
+    <div class="nav-right">
+        <a href="{% url 'home' %}" class="nav-link">
+            <i class='bx bx-left-arrow-alt'></i> Orqaga
+        </a>
+    </div>
+
+</div>
+
+
+</nav>
+
+<!-- =========================
+        Main Wrapper
+========================= -->
+
+<main class="main-wrapper">
+
+
+<div class="profile-container">
+
+    <h1 class="profile-title">Foydalanuvchi Profili</h1>
+
+    <div class="profile-card">
+
+        <div class="profile-info">
+
+            <p><strong>ID:</strong> {{ user.id }}</p>
+            <p><strong>Username:</strong> {{ user.username }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Ism:</strong> {{ user.first_name }}</p>
+            <p><strong>Familiya:</strong> {{ user.last_name }}</p>
+            <p><strong>Ro‘yxatdan o‘tgan sana:</strong> {{ date_joined_uz }}</p>
+
+            <p class="status">
+                <strong>Status:</strong>
+
+                {% if user.vip_data.vip_active %}
+                    <span class="vip">
+                        <i class='bx bx-crown'></i> VIP
+                    </span>
+                {% else %}
+                    <span class="normal">
+                        <i class='bx bx-user'></i> Oddiy
+                    </span>
+                {% endif %}
+            </p>
+
+        </div>
+
+        <div class="site-info">
+            <p><strong>Saytdagi jami foydalanuvchilar:</strong> {{ total_users }}</p>
+        </div>
+
+    </div>
+
+</div>
+
+
+</main>
+
+</body>
+</html>

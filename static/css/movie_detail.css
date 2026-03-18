@@ -1,0 +1,226 @@
+/* =======================
+   RESET
+======================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+/* =======================
+   BODY
+======================= */
+body {
+    background: #0b0f19;
+    color: #ffffff;
+    min-height: 100vh;
+}
+
+/* =======================
+   TOP BAR
+======================= */
+.top-bar {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 15px 30px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    flex-wrap: wrap;
+}
+
+.movie-title {
+    font-size: 22px;
+    font-weight: 600;
+}
+
+/* BACK BUTTON */
+.top-bar .btn {
+    text-decoration: none;
+    color: #fff;
+    background: #ff4b2b;
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.top-bar .btn:hover {
+    opacity: 0.9;
+    transform: translateX(-3px);
+}
+
+/* =======================
+   MAIN WRAPPER
+======================= */
+.movie-wrapper {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px;
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+/* VIDEO BOX */
+.video-box {
+    flex: 2;
+    background: #11162a;
+    padding: 20px;
+    border-radius: 18px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+}
+
+.video-box video {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    outline: none;
+}
+
+/* EPISODE LIST */
+.episodes-box {
+    flex: 1;
+    background: #11162a;
+    padding: 20px;
+    border-radius: 15px;
+    max-height: 500px;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.episodes-box h4 {
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* =======================
+   Episode Buttons
+======================= */
+.episode-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.episode-btn {
+    flex: 1 1 15%; /* Desktop: 1 qatorga 6 tugma */
+    min-width: 50px;
+    padding: 10px 0;
+    background: #0b0f19; /* background filmga mos */
+    color: #fff;
+    border: 2px solid #3498db; /* kuk rang border */
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    text-align: center;
+    transition: 0.2s;
+}
+
+.episode-btn:hover,
+.active-episode-btn {
+    background: #3498db;
+    color: #fff;
+}
+
+/* Telegram download button wrapper */
+.telegram-download-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 40px 0;
+}
+
+/* Button style */
+.telegram-download-btn {
+    background: linear-gradient(45deg, #0088cc, #00aced);
+    color: #fff;
+    padding: 14px 35px;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: 0.3s ease;
+    box-shadow: 0 6px 20px rgba(0, 136, 204, 0.4);
+}
+
+.telegram-download-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 136, 204, 0.6);
+    color: #fff;
+}
+
+/* INFO SECTION */
+.movie-info {
+    width: 100%;
+    margin-top: 30px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 25px;
+    border-radius: 15px;
+    line-height: 1.7;
+}
+
+.movie-info h4 {
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+.movie-info p {
+    font-size: 15px;
+    color: #dcdcdc;
+}
+
+/* =======================
+   RESPONSIVE
+======================= */
+@media (max-width: 992px) {
+    .movie-wrapper {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 768px) {
+    .movie-title {
+        font-size: 18px;
+    }
+
+    .movie-wrapper {
+        margin: 25px auto;
+    }
+
+    .episodes-box {
+        max-height: 350px;
+    }
+
+    .episode-btn {
+        flex: 1 1 22%; /* Telefon: 1 qatorga 4 tugma */
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .top-bar .btn {
+        padding: 6px 14px;
+        font-size: 14px;
+    }
+
+    .episodes-box {
+        max-height: none;
+    }
+
+    .episode-btn {
+        flex: 1 1 45%; /* Juda kichik ekran: 2-qatorga bo‘linadi */
+        font-size: 13px;
+    }
+}
+
+/* End of CSS */
